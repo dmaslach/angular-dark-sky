@@ -104,7 +104,7 @@
             var query = '&' + excludeString('daily');
             return fetch(latitude, longitude, query);
           },
-          forecast7: function() {
+          forecast: function() {
             // exclude current weather data from response
             var query = '&' + excludeString('currently');
             return fetch(latitude, longitude, query);
