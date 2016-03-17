@@ -1,10 +1,11 @@
 /**
  * angular-forecast-io
  *
- * A simple & configurable provider for forecast.io weather data api
+ * A simple & configurable provider for forecast.io including icon directive using weather-icons 
  *
  * @link https://github.com/deanbot/angular-forecast-io
- * @ref https://developer.forecast.io/docs/v2
+ * @see {@link https://developer.forecast.io/docs/v2}
+ * @see {@link http://erikflowers.github.io/weather-icons}
  * @author Dean Verleger <deanverleger@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -12,8 +13,12 @@
   'use strict';
 
   angular.module('forecast-io', [])
-    .provider('forecastIO', forecastIOProvider);
+    .provider('forecastIO', forecastIOProvider)
+    .directive('forecastIoIcon', ['forecastIO', forecastIoIcon]);
 
+  /**
+   * forecast.io weather data provider
+   */
   function forecastIOProvider() {
     var apiKey,
     _config = {
@@ -147,6 +152,21 @@
       }
       
     }];
+  }
+
+  /**
+   * forecast.io weather-icons directive
+   * @example <forecast-io-icon icon="{{ icon }}"></forecast-io-icon>
+   * @see {@link http://erikflowers.github.io/weather-icons}
+   */
+  function forecastIoIcon(forecastIO) {
+    return {
+      restrict: 'E',
+      scope: {
+        icon: '@'
+      },
+      template: '<i class="wi wi-forecast-io-{{ icon }}"></i>'
+    };
   }
 
 })();
