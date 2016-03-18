@@ -4,8 +4,9 @@
  * A simple & configurable provider for forecast.io including icon directive using weather-icons 
  *
  * @link https://github.com/deanbot/angular-forecast-io
- * @see {@link https://developer.forecast.io/docs/v2}
- * @see {@link http://erikflowers.github.io/weather-icons}
+ * @see {@link https://developer.forecast.io/}
+ * @see {@link https://developer.forecast.io/docs/v2|Docs}
+ * @see {@link http://erikflowers.github.io/weather-icons|weather-icons}
  * @author Dean Verleger <deanverleger@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -31,7 +32,6 @@
     /**
      * Set api key for request
      * @params value {String} - your forecast.io api key
-     * @ref https://developer.forecast.io/register
      */
     this.setApiKey = function(value) {
       apiKey = value;
