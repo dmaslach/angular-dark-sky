@@ -31,7 +31,7 @@
 
     /**
      * Set api key for request
-     * @params value {String} - your forecast.io api key
+     * @param {String} value - your forecast.io api key
      */
     this.setApiKey = function(value) {
       apiKey = value;
@@ -40,17 +40,17 @@
 
     /**
      * Set unit type for response formatting
-     * @params value {String} - unit token
+     * @param {String} value - unit token
      * @ref https://developer.forecast.io/docs/v2#options
      */
     this.setUnits = function(value) {
       units = value;
       return this;
-    }
+    };
 
     /**
      * Set language for response summaries
-     * @params value {String} - language token
+     * @param {String} value - language token
      * @ref https://developer.forecast.io/docs/v2#options
      */
     this.setLanguage = function(value) {
@@ -67,8 +67,9 @@
         getForecast: getForecast
       };
 
-      if (!apiKey)
+      if (!apiKey) {
         console.warn('No forecast.io API key set.');
+      }
 
       return service;
 
@@ -76,9 +77,9 @@
 
       /**
        * Get current weather data
-       * @params latitude {Number}
-       * @params longitude {Number}
-       * @return {Promise} - resolves with current weather data object
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @returns {Promise} - resolves with current weather data object
        */
       function getCurrent(latitude, longitude) {
         return api(latitude, longitude).current();
@@ -86,9 +87,9 @@
 
       /**
        * Get daily weather data
-       * @params latitude {Number}
-       * @params longitude {Number}
-       * @return {Promise} - resolves with daily weather data object
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @returns {Promise} - resolves with daily weather data object
        */
       function getForecast(latitude, longitude) {
         return api(latitude, longitude).forecast();
@@ -98,9 +99,9 @@
       
       /**
        * Expose api methods with latitude and longitude mapping
-       * @params latitude {Number}
-       * @params longitude {Number}
-       * @return {Object} - Objec with API method properties
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @returns {Object} - object with API method properties
        */
       function api(latitude, longitude) {
         return {
@@ -119,11 +120,11 @@
 
       /**
        * Perform http jsonp request for weather data
-       * @params latitude {Number}
-       * @params longitude {Number}
-       * @params query {String} - additional request params query string
-       *  .. see https://developer.forecast.io/docs/v2#options
-       * @return {Promise} - resolves to weather data object
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @param query {String} - additional request params query string
+       * see {@link https://developer.forecast.io/docs/v2#options}
+       * @returns {Promise} - resolves to weather data object
        */
       function fetch(latitude, longitude, query) {
         var url = [_config.baseUri, apiKey, '/', latitude, ',', longitude, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
@@ -144,8 +145,8 @@
 
       /**
        * Get exclude items decorated with base exclude string
-       * @params toExclude {String} - comma separated list with no spaces of blocks to exclude
-       * @return {String} - exclude query string with base excludes and your excludes
+       * @param {String} toExclude - comma separated list with no spaces of blocks to exclude
+       * @returns {String} - exclude query string with base excludes and your excludes
        */
       function excludeString(toExclude) {
         return _config.baseExclude + ',' + toExclude;
