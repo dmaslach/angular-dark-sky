@@ -3,7 +3,7 @@ angular-forecast-io
 
 Angular.js provider for fetching current and forecasted (7 days) weather data using the forecast.io API.
 
-An API key from [Forecast.IO](http://http://forecast.io/) is required in order to use this provider. See https://developer.forecast.io/ for further information. Honorable mention to [ng-weathermap](https://github.com/OpenServices/ng-weathermap) for which much formatting is derived.
+An API key from [Forecast.IO](http://forecast.io/) is required in order to use this provider. See https://developer.forecast.io/ for further information. Honorable mention to [ng-weathermap](https://github.com/OpenServices/ng-weathermap) for which much formatting is derived.
 
 A directive is also included that maps Forecast.io weather condition IDs
 to the excellent [weather-icons](http://erikflowers.github.io/weather-icons/) by
@@ -27,7 +27,7 @@ Getting started
             forecastIOProvider
                 .setApiKey('XXXXXXX');
         }]);
- 
+
  * Inject service - inject `forecastIO` service into your Ctrl/directive/service/etc:
 
  		angular.module('app.weatherWidget')
@@ -47,7 +47,7 @@ Getting started
 			        		.catch(console.warn);
 			        }
 
-					// Get current location coordinates if supported by browser			        
+					// Get current location coordinates if supported by browser
 		        	function getNavigatorCoords() {
 		        		var deferred = $q.defer();
 
