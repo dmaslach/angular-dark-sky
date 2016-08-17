@@ -1,7 +1,7 @@
 /**
  * angular-forecast-io
  *
- * A simple & configurable provider for forecast.io including icon directive using weather-icons 
+ * A simple & configurable provider for forecast.io including icon directive using weather-icons
  *
  * @link https://github.com/deanbot/angular-forecast-io
  * @see {@link https://developer.forecast.io/}
@@ -96,7 +96,7 @@
             }
 
             /** Private Methods */
-          
+
             /**
              * Expose api methods with latitude and longitude mapping
              * @param {Number} latitude
