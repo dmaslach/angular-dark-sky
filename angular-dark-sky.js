@@ -1,11 +1,11 @@
 /**
- * angular-forecast-io
+ * angular-dark-sky
  *
- * A simple & configurable provider for forecast.io including icon directive using weather-icons
+ * A simple & configurable provider for the dark sky api including icon directive using weather-icons
  *
- * @link https://github.com/deanbot/angular-forecast-io
- * @see {@link https://developer.forecast.io/}
- * @see {@link https://developer.forecast.io/docs/v2|Docs}
+ * @link https://github.com/deanbot/angular-dark-sky
+ * @see {@link https://darksky.net/dev/}
+ * @see {@link https://darksky.net/dev/docs/|Docs}
  * @see {@link http://erikflowers.github.io/weather-icons|weather-icons}
  * @author Dean Verleger <deanverleger@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -13,17 +13,17 @@
 (function() {
     'use strict';
 
-    angular.module('forecast-io', [])
-        .provider('forecastIO', forecastIOProvider)
-        .directive('forecastIoIcon', ['forecastIO', forecastIoIcon]);
+    angular.module('dark-sky', [])
+        .provider('darkSky', darkSkyProvider)
+        .directive('darkSkyIcon', ['darkSky', darkSkyIcon]);
 
     /**
      * forecast.io weather data provider
      */
-    function forecastIOProvider() {
+    function darkSkyProvider() {
         var apiKey,
             _config = {
-                baseUri: 'https://api.forecast.io/forecast/',
+                baseUri: 'https://api.darksky.net/',
                 baseExclude: 'exclude=alerts,flags,hourly,minutely'
             },
             units = 'us',
@@ -156,10 +156,10 @@
 
     /**
      * forecast.io weather-icons directive
-     * @example <forecast-io-icon icon="{{ icon }}"></forecast-io-icon>
+     * @example <dark-sky-icon icon="{{ icon }}"></dark-sky-icon>
      * @see {@link http://erikflowers.github.io/weather-icons}
      */
-    function forecastIoIcon(forecastIO) {
+    function darkSkyIcon(darkSky) {
         return {
             restrict: 'E',
             scope: {
