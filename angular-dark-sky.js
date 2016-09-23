@@ -68,7 +68,7 @@
             };
 
             if (!apiKey) {
-                console.warn('No forecast.io API key set.');
+                console.warn('No Dark Sky API key set.');
             }
 
             return service;
