@@ -23,7 +23,7 @@
     function darkSkyProvider() {
         var apiKey,
             _config = {
-                baseUri: 'https://api.darksky.net/',
+                baseUri: 'https://api.darksky.net/forecast/',
                 baseExclude: 'exclude=alerts,flags,hourly,minutely'
             },
             units = 'us',
