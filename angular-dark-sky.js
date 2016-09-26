@@ -22,12 +22,16 @@
    */
   function darkSkyProvider() {
     var apiKey,
-      _config = {
+      config = {
         baseUri: 'https://api.darksky.net/forecast/',
-        baseExclude: 'exclude=alerts,flags,hourly,minutelWy'
+        baseExclude: '&exclude=',
+        acceptedUnits: ['auto', 'ca', 'uk2', 'us', 'si'],
+        acceptedLanguage: [ 
+          'ar', 'az', 'be', 'bs', 'cs', 'de', 'el', 'en', 'es', 'fr', 'hr', 'hu', 'id', 'it', 'is', 'kw', 'nb', 'nl', 'pl', 'pt', 'ru', 'sk', 'sr', 'sv', 'tet', 'tr', 'uk', 'x-pig-latin', 'zh', 'zh-tw'
+        ]
       },
-      units = 'us',
-      language = 'en';
+      units = 'us', // default unit
+      language = 'en'; // default language
 
     /**
      * Set api key for request
@@ -43,6 +47,9 @@
      * @param {String} value - unit token
      */
     this.setUnits = function(value) {
+      if (_.indexOf(config.acceptedUnits, value) === -1) {
+        console.warn(value + ' not an accepted api unit');
+      }
       units = value;
       return this;
     };
@@ -52,6 +59,9 @@
      * @param {String} value - language token
      */
     this.setLanguage = function(value) {
+      if (_.indexOf(config.acceptedLanguage, value) === -1) {
+        console.warn(value + ' not an accepted api language');
+      }
       language = value;
       return this;
     };
@@ -62,7 +72,12 @@
     this.$get = ['$http', '$q', function($http, $q) {
       var service = {
         getCurrent: getCurrent,
-        getForecast: getForecast
+        getForecast: getForecastDaily,
+        getDailyForecast: getForecastDaily,
+        getForecastHourly: getForecastHourly,
+        getForecastMinutely: getForecastMinutely,
+        getAlerts: getAlerts,
+        getFlags: getFlags
       };
 
       if (!apiKey) {
@@ -77,9 +92,10 @@
        * Get current weather data
        * @param {Number} latitude
        * @param {Number} longitude
+       * @param {object} options
        * @returns {Promise} - resolves with current weather data object
        */
-      function getCurrent(latitude, longitude) {
+      function getCurrent(latitude, longitude, options) {
         return api(latitude, longitude).current();
       }
 
@@ -87,10 +103,80 @@
        * Get daily weather data
        * @param {Number} latitude
        * @param {Number} longitude
+       * @param {object} options
        * @returns {Promise} - resolves with daily weather data object
        */
-      function getForecast(latitude, longitude) {
-        return api(latitude, longitude).forecast();
+      function getForecastDaily(latitude, longitude, options) {
+        return api(latitude, longitude).daily();
+      }
+
+      /**
+       * Get hourly weather data
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @param {object} options
+       * @returns {Promise} - resolves with hourly weather data object
+       */
+      function getForecastHourly(latitude, longitude, options) {
+        return api(latitude, longitude).hourly();
+      }
+
+      /**
+       * Get minutely weather data
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @param {object} options
+       * @returns {Promise} - resolves with minutely weather data object
+       */
+      function getForecastMinutely(latitude, longitude, options) {
+        return api(latitude, longitude).minutely();
+      }
+
+      /**
+       * Get alerts weather data
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @param {object} options
+       * @returns {Promise} - resolves with alerts weather data object
+       */
+      function getAlerts(latitude, longitude, options) {
+        return api(latitude, longitude).alerts();
+      }
+
+      /**
+       * Get units object showing units returned based on configured language/units
+       */
+      function getUnits() {
+        var unitsObject,
+          // per api defualt assume us if omitted 
+          unitId = 'us';
+
+        // determine unit id
+        if (units) {
+          if (units === 'auto') {
+            console.warn('Can\'t guess units. Defaulting to Imperial');
+            unitId = 'us';
+          } else {
+            unitId = units;
+          }
+        }
+
+        // get units object by id
+        switch (unitId) {
+          case 'ca':
+            unitsObject = getCaUnits();
+            break;
+          case 'uk2':
+            unitsObject = getUk2Units();
+            break;
+          case 'us':
+            unitsObject = getUsUnits();
+            break;
+          case 'si':
+            unitsObject = getSiUnits();
+            break;
+        }
+        return unitsObject;
       }
 
       /** Private Methods */
@@ -104,16 +190,42 @@
       function api(latitude, longitude) {
         return {
           current: function() {
-            // exclude daily weather data from response
-            var query = '&' + excludeString('daily');
+            var query = excludeString('currently');
             return fetch(latitude, longitude, query);
           },
-          forecast: function() {
-            // exclude current weather data from response
-            var query = '&' + excludeString('currently');
+          daily: function() {
+            var query = excludeString('daily');
+            return fetch(latitude, longitude, query);
+          },
+          hourly: function() {
+            var query = excludeString('hourly');
+            return fetch(latitude, longitude, query);
+          },
+          minutely: function() {
+            var query = excludeString('minutely')
+            return fetch(latitude, longitude, query);
+          },
+          alerts: function() {
+            var query = excludeString('alerts');
+            return fetch(latitude, longitude, query);
+          },
+          flags: function() {
+            var query = excludeString('flags');
             return fetch(latitude, longitude, query);
           }
         };
+      }
+
+      /**
+       * Get exclude items by excluding all items except what is passed in
+       * @param {String} toRetrieve - single block to include in results
+       * @returns {String} - exclude query string with base excludes and your excludes
+       */
+      function excludeString(toRetrieve) {
+        var blocks = ['alerts', 'currently', 'daily', 'flags', 'hourly', 'minutely'],
+          excludes = _.filter(blocks, toRetrieve),
+          query = _.join(excludes, ',');
+        return config.baseExclude +  query;
       }
 
       /**
@@ -124,13 +236,13 @@
        * @returns {Promise} - resolves to weather data object
        */
       function fetch(latitude, longitude, query) {
-        var url = [_config.baseUri, apiKey, '/', latitude, ',', longitude, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
+        var url = [config.baseUri, apiKey, '/', latitude, ',', longitude, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
         return $http
           .jsonp(url)
           .then(function(results) {
             // check response code
             if (parseInt(results.status) === 200) {
-              return results.data
+              return results.data;
             } else {
               return $q.reject(results);
             }
@@ -141,13 +253,68 @@
       }
 
       /**
-       * Get exclude items decorated with base exclude string
-       * @param {String} toExclude - comma separated list with no spaces of blocks to exclude
-       * @returns {String} - exclude query string with base excludes and your excludes
+       * Return the us units
+       * @returns {object} units
        */
-      function excludeString(toExclude) {
-        return _config.baseExclude + ',' + toExclude;
+      function getUsUnits() {
+        return {
+          nearestStormDistance: 'mi',
+          precipIntensity: 'in/h',
+          precipIntensityMax: 'in/h',
+          precipAccumulation: 'in',
+          temperature: 'f',
+          temperatureMin: 'f',
+          temperatureMax: 'f',
+          apparentTemperature: 'f',
+          dewPoint: 'f',
+          windSpeed: 'mph',
+          pressure: 'mbar',
+          visibility: 'mi'
+        };
       }
+
+      /**
+       * Return the si units
+       * @returns {object} units
+       */
+      function getSiUnits() {
+        return {
+          nearestStormDistance: 'km',
+          precipIntensity: 'mm/h',
+          precipIntensityMax: 'mm/h',
+          precipAccumulation: 'cm',
+          temperature: 'c',
+          temperatureMin: 'c',
+          temperatureMax: 'c',
+          apparentTemperature: 'c',
+          dewPoint: 'c',
+          windSpeed: 'mps',
+          pressure: 'hPa',
+          visibility: 'km'
+        };
+      }
+
+      /** 
+       * Return ca units
+       * @returns {object} units
+       */
+      function getCaUnits() {
+        var unitsObject = getUsUnits();
+        unitsObject.windSpeed = 'km/h';
+        return unitsObject;
+      }
+
+      /**
+       * Return uk2 units
+       * @returns {object} units
+       */
+      function getUk2Units() {
+        var unitsObject = getSiUnits();
+        unitsObject.nearestStormDistance = unitsObject.visibility = 'mi';
+        unitsObject.windSpeed = 'mph';
+        return unitsObject;
+      }
+
     }];
   }
 
