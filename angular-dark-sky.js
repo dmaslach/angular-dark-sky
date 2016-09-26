@@ -77,7 +77,8 @@
         getForecastHourly: getForecastHourly,
         getForecastMinutely: getForecastMinutely,
         getAlerts: getAlerts,
-        getFlags: getFlags
+        getFlags: getFlags,
+        getUnits: getUnits
       };
 
       if (!apiKey) {
@@ -144,7 +145,19 @@
       }
 
       /**
+       * Get flags weather data
+       * @param {Number} latitude
+       * @param {Number} longitude
+       * @param {object} options
+       * @returns {Promise} - resolves with flags weather data object
+       */
+      function getFlags(latitude, longitude, options) {
+        return api(latitude, longitude).flags();
+      }
+
+      /**
        * Get units object showing units returned based on configured language/units
+       * @returns {object} units
        */
       function getUnits() {
         var unitsObject,
