@@ -1,7 +1,7 @@
 /**
  * angular-dark-sky
  *
- * A simple & configurable provider for the dark sky api including icon directive using weather-icons
+ * A simple & configurable provider for the Dark Sky API including icon directive using weather-icons
  *
  * @link https://github.com/deanbot/angular-dark-sky
  * @see {@link https://darksky.net/dev/}
@@ -18,7 +18,7 @@
     .directive('darkSkyIcon', ['darkSky', darkSkyIcon]);
 
   /**
-   * forecast.io weather data provider
+   * Dark Sky weather data provider
    */
   function darkSkyProvider() {
     var apiKey,
@@ -34,8 +34,8 @@
       language = 'en'; // default language
 
     /**
-     * Set api key for request
-     * @param {String} value - your forecast.io api key
+     * Set API key for request
+     * @param {String} value - your Dark Sky API key
      */
     this.setApiKey = function(value) {
       apiKey = value;
@@ -48,7 +48,7 @@
      */
     this.setUnits = function(value) {
       if (_.indexOf(config.acceptedUnits, value) === -1) {
-        console.warn(value + ' not an accepted api unit');
+        console.warn(value + ' not an accepted API unit.');
       }
       units = value;
       return this;
@@ -60,7 +60,7 @@
      */
     this.setLanguage = function(value) {
       if (_.indexOf(config.acceptedLanguage, value) === -1) {
-        console.warn(value + ' not an accepted api language');
+        console.warn(value + ' not an accepted API language.');
       }
       language = value;
       return this;
@@ -74,85 +74,95 @@
         getCurrent: getCurrent,
         getForecast: getForecastDaily,
         getDailyForecast: getForecastDaily,
-        getForecastHourly: getForecastHourly,
-        getForecastMinutely: getForecastMinutely,
+        getHourlyForecast: getForecastHourly,
+        getMinutelyForecast: getForecastMinutely,
         getAlerts: getAlerts,
         getFlags: getFlags,
         getUnits: getUnits
       };
-
       if (!apiKey) {
         console.warn('No Dark Sky API key set.');
       }
-
       return service;
 
       /** Public Methods */
 
       /**
        * Get current weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with current weather data object
+       * @param {number} latitude position
+       * @param {number} longitude position
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with current weather data object
        */
       function getCurrent(latitude, longitude, options) {
-        return api(latitude, longitude).current();
+        return api(latitude, longitude, options).current();
       }
 
       /**
        * Get daily weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with daily weather data object
+       * @param {number} latitude positition
+       * @param {number} longitude positition
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with daily weather data object
        */
       function getForecastDaily(latitude, longitude, options) {
-        return api(latitude, longitude).daily();
+        return api(latitude, longitude, options).daily();
       }
 
       /**
        * Get hourly weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with hourly weather data object
+       * @param {number} latitude positition
+       * @param {number} longitude positition
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with hourly weather data object
        */
       function getForecastHourly(latitude, longitude, options) {
-        return api(latitude, longitude).hourly();
+        return api(latitude, longitude, options).hourly();
       }
 
       /**
        * Get minutely weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with minutely weather data object
+       * @param {number} latitude positition
+       * @param {number} longitude positition
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with minutely weather data object
        */
       function getForecastMinutely(latitude, longitude, options) {
-        return api(latitude, longitude).minutely();
+        return api(latitude, longitude, options).minutely();
       }
 
       /**
        * Get alerts weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with alerts weather data object
+       * @param {number} latitude positition
+       * @param {number} longitude positition
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with alerts weather data object
        */
       function getAlerts(latitude, longitude, options) {
-        return api(latitude, longitude).alerts();
+        return api(latitude, longitude, options).alerts();
       }
 
       /**
        * Get flags weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param {object} options
-       * @returns {Promise} - resolves with flags weather data object
+       * @param {number} latitude positition
+       * @param {number} longitude positition
+       * @param {object} [options] - additional query options
+       * ... {unix timestamp} options.time - send timestamp for timemachine requests
+       * ... {boolean} options.extend - pass true for extended forecast 
+       * @returns {promise} - resolves with flags weather data object
        */
       function getFlags(latitude, longitude, options) {
-        return api(latitude, longitude).flags();
+        return api(latitude, longitude, options).flags();
       }
 
       /**
@@ -161,7 +171,7 @@
        */
       function getUnits() {
         var unitsObject,
-          // per api defualt assume us if omitted 
+          // per API defualt assume 'us' if omitted 
           unitId = 'us';
 
         // determine unit id
@@ -195,61 +205,92 @@
       /** Private Methods */
 
       /**
-       * Expose api methods with latitude and longitude mapping
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @returns {Object} - object with API method properties
+       * Expose API methods with latitude and longitude mapping
+       * @param {number} latitude
+       * @param {number} longitude
+       * @param {object} options
+       * @returns {oObject} - object with API method properties
        */
-      function api(latitude, longitude) {
+      function api(latitude, longitude, options) {
+        var time;
+
+        // check for time option
+        if (options && options.time) {
+          time = options.time;
+          if (!moment(time).isValid()) {
+            console.warn('Specified time is not valid');
+          }
+        }
         return {
           current: function() {
-            var query = excludeString('currently');
-            return fetch(latitude, longitude, query);
+            var query = excludeString('currently') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           },
           daily: function() {
-            var query = excludeString('daily');
-            return fetch(latitude, longitude, query);
+            var query = excludeString('daily') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           },
           hourly: function() {
-            var query = excludeString('hourly');
-            return fetch(latitude, longitude, query);
+            var query = excludeString('hourly') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           },
           minutely: function() {
-            var query = excludeString('minutely')
-            return fetch(latitude, longitude, query);
+            var query = excludeString('minutely') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           },
           alerts: function() {
-            var query = excludeString('alerts');
-            return fetch(latitude, longitude, query);
+            var query = excludeString('alerts') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           },
           flags: function() {
-            var query = excludeString('flags');
-            return fetch(latitude, longitude, query);
+            var query = excludeString('flags') + optionsString(options);
+            return fetch(latitude, longitude, query, time);
           }
         };
       }
 
       /**
        * Get exclude items by excluding all items except what is passed in
-       * @param {String} toRetrieve - single block to include in results
-       * @returns {String} - exclude query string with base excludes and your excludes
+       * @param {string} toRetrieve - single block to include in results
+       * @returns {string} - exclude query string with base excludes and your excludes
        */
       function excludeString(toRetrieve) {
         var blocks = ['alerts', 'currently', 'daily', 'flags', 'hourly', 'minutely'],
-          excludes = _.filter(blocks, toRetrieve),
+          excludes = _.without(blocks, toRetrieve),
           query = _.join(excludes, ',');
         return config.baseExclude +  query;
       }
 
       /**
-       * Perform http jsonp request for weather data
-       * @param {Number} latitude
-       * @param {Number} longitude
-       * @param query {String} - additional request params query string
-       * @returns {Promise} - resolves to weather data object
+       * Get query string for additional API options
+       * @param {object} options
+       * @returns {string} additional options query string
        */
-      function fetch(latitude, longitude, query) {
-        var url = [config.baseUri, apiKey, '/', latitude, ',', longitude, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
+      function optionsString(options) {
+        var defaults = {
+            extend: false
+          },
+          atts = _.defaults(options, defaults),
+          query = '';
+        if (options) {
+          // parse extend option
+          if (atts.extend) {
+            query += '&extend=hourly';
+          }
+        }
+      }
+
+      /**
+       * Perform http jsonp request for weather data
+       * @param {number} latitude - position latitude
+       * @param {number} longitude - position longitude
+       * @param {string} query - additional request params query string
+       * @param {number} time - timestamp for timemachine requests
+       * @returns {promise} - resolves to weather data object
+       */
+      function fetch(latitude, longitude, query, time) {
+        var time = time ? ', ' + time : '',
+          url = [config.baseUri, apiKey, '/', latitude, ',', longitude, time, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
         return $http
           .jsonp(url)
           .then(function(results) {
@@ -266,7 +307,7 @@
       }
 
       /**
-       * Return the us units
+       * Return the us response units
        * @returns {object} units
        */
       function getUsUnits() {
@@ -287,7 +328,7 @@
       }
 
       /**
-       * Return the si units
+       * Return the si response units
        * @returns {object} units
        */
       function getSiUnits() {
@@ -308,7 +349,7 @@
       }
 
       /** 
-       * Return ca units
+       * Return ca response units
        * @returns {object} units
        */
       function getCaUnits() {
@@ -318,7 +359,7 @@
       }
 
       /**
-       * Return uk2 units
+       * Return uk2 response units
        * @returns {object} units
        */
       function getUk2Units() {
@@ -332,7 +373,7 @@
   }
 
   /**
-   * forecast.io weather-icons directive
+   * Dark Sky weather-icons directive
    * @example <dark-sky-icon icon="{{ icon }}"></dark-sky-icon>
    * @see {@link http://erikflowers.github.io/weather-icons}
    */
