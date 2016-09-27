@@ -69,19 +69,21 @@ Provider API
 
 The `darkSky` provider exposes the following Dark Sky API methods to fetch data:
 
- * `darkSky.getCurrent(43.0667, 89.4000)`: Get current weather data
- * `darkSky.getDailyForecast(43.0667, 89.4000)`: Get forecasted weather data in days
- * `darkSky.getHourlyForecast(43.0667, 89.4000)`: Get forecasted weather data in hours
- * `darkSky.getMinutelyForecast(43.0667, 89.4000)`: Get forecasted weather data in minutes
- * `darkSky.getAlerts(43.0667, 89.4000)`: Get alerts data
- * `darkSky.getFlags(43.0667, 89.4000)`: Get flags data
- * `darkSky.getUnits()`: Get response units object (i.e. `{ temperature: 'f', windSpeed: 'mph', [...] }`)
+ * `darkSky.getCurrent(43.0667, 89.4000)`: Get current weather data.
+ * `darkSky.getDailyForecast(43.0667, 89.4000)`: Get forecasted weather data in days.
+ * `darkSky.getHourlyForecast(43.0667, 89.4000)`: Get forecasted weather data in hours.
+ * `darkSky.getMinutelyForecast(43.0667, 89.4000)`: Get forecasted weather data in minutes.
+ * `darkSky.getAlerts(43.0667, 89.4000)`: Get alerts data.
+ * `darkSky.getFlags(43.0667, 89.4000)`: Get flags data.
+ * `darkSky.getUnits()`: Get response units object (i.e. `{ temperature: 'f', windSpeed: 'mph', [...] }`).
 
-Both methods take latitude and longitude and return an angular Promise which resolves with the data object as retrieved from Dark Sky. The promise is rejected if there was an error. See [data points]https://darksky.net/dev/docs/response#data-point) for an explaination of the data structure retrieved.
+Both methods take latitude and longitude and return an angular Promise which resolves with the data object as retrieved from Dark Sky. The promise is rejected if there was an error. See [data points](https://darksky.net/dev/docs/response#data-point) for an explaination of the data structure retrieved.
 
 ### Options
 
-All API methods except getUnits take an additional options object as the 3rd parameter. i.e. `darkSky.getCurrent(43.0667, 89.4000, { extend: true })`.
+All API methods (except getUnits) take an additional options object as the 3rd parameter.
+
+i.e: `darkSky.getCurrent(43.0667, 89.4000, { extend: true })`
 
 Supported options include:
 
@@ -90,7 +92,7 @@ Supported options include:
 
 ### Configuration
 
- * `darkSkyProvider.setApiKey('XXXXXXX')`: Set Dark Sky API key
+ * `darkSkyProvider.setApiKey('XXXXXXX')`: Set Dark Sky API key.
  * `darkSkyProvider.setUnits('us')`: Set unit type for response formatting, see
  	 the [list of supported units](https://darksky.net/dev/docs/forecast). Defaults to 'us'.
  * `darkSkyProvider.setLanguage('en')`: Set language for response summaries, see
