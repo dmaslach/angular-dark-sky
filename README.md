@@ -40,8 +40,8 @@ Getting started
 		        	// log current weather data
 		        	function activate() {
 		        		getNavigatorCoords()
-			        		.then(function(latitude, longitude) {
-			        			darkSky.getCurrent(latitude, longitude)
+			        		.then(function(position) {
+			        			darkSky.getCurrent(position.latitude, position.longitude)
 			        				.then(console.log)
 			        				.catch(console.warn);
 			        		})
