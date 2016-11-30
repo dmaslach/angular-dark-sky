@@ -15,6 +15,7 @@ Getting started
  * Include Scripts - the provider script should be included after the AngularJS script:
 
         <script type='text/javascript' src='path/to/angular.min.js'></script>
+        <script type='text/javascript' src='path/to/lodash.min.js'></script>
         <script type='text/javascript' src='path/to/angular-dark-sky.js'></script>
 
  * Specifiy Dependency - ensure that your application module specifies dark-sky as a dependency:

@@ -383,7 +383,7 @@
       scope: {
         icon: '@'
       },
-      template: '<i class="wi wi-forecast-io-{{ icon }}"></i>'
+      template: '<i class="wi wi-forecast-io-{{ icon }} wi-dark-sky-{{ icon }}"></i>'
     };
   }
 
