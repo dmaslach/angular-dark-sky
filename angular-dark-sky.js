@@ -9,7 +9,6 @@
  * @see {@link http://erikflowers.github.io/weather-icons|weather-icons}
  * @author Dean Verleger <deanverleger@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
-
  */
 (function() {
   'use strict';
