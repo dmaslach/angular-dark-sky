@@ -9,6 +9,7 @@
  * @see {@link http://erikflowers.github.io/weather-icons|weather-icons}
  * @author Dean Verleger <deanverleger@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
+
  */
 (function() {
   'use strict';
@@ -32,7 +33,7 @@
       },
       units = 'us', // default unit
       language = 'en'; // default language
-
+		
     /**
      * Set API key for request
      * @param {String} value - your Dark Sky API key
@@ -42,6 +43,16 @@
       return this;
     };
 
+	this.setLatitude = function(value) {
+		var latitude = value;
+		return this;
+	};
+	
+	this.setLongitude = function(value) {
+		var longitude = value;
+		return this;
+	}
+	
     /**
      * Set unit type for response formatting
      * @param {String} value - unit token
@@ -71,14 +82,7 @@
      */
     this.$get = ['$http', '$q', function($http, $q) {
       var service = {
-        getCurrent: getCurrent,
-        getForecast: getForecastDaily,
-        getDailyForecast: getForecastDaily,
-        getHourlyForecast: getForecastHourly,
-        getMinutelyForecast: getForecastMinutely,
-        getAlerts: getAlerts,
-        getFlags: getFlags,
-        getUnits: getUnits
+		getWeather: getWeather
       };
       if (!apiKey) {
         console.warn('No Dark Sky API key set.');
@@ -91,80 +95,17 @@
        * Get current weather data
        * @param {number} latitude position
        * @param {number} longitude position
+	   * @param {array} elements to retrieve ('alerts', 'currently', 'daily', 'flags', 'hourly', 'minutely'). Enclose with []
        * @param {object} [options] - additional query options
        * ... {unix timestamp} options.time - send timestamp for timemachine requests
        * ... {boolean} options.extend - pass true for extended forecast 
        * @returns {promise} - resolves with current weather data object
        */
-      function getCurrent(latitude, longitude, options) {
-        return api(latitude, longitude, options).current();
-      }
 
-      /**
-       * Get daily weather data
-       * @param {number} latitude positition
-       * @param {number} longitude positition
-       * @param {object} [options] - additional query options
-       * ... {unix timestamp} options.time - send timestamp for timemachine requests
-       * ... {boolean} options.extend - pass true for extended forecast 
-       * @returns {promise} - resolves with daily weather data object
-       */
-      function getForecastDaily(latitude, longitude, options) {
-        return api(latitude, longitude, options).daily();
-      }
-
-      /**
-       * Get hourly weather data
-       * @param {number} latitude positition
-       * @param {number} longitude positition
-       * @param {object} [options] - additional query options
-       * ... {unix timestamp} options.time - send timestamp for timemachine requests
-       * ... {boolean} options.extend - pass true for extended forecast 
-       * @returns {promise} - resolves with hourly weather data object
-       */
-      function getForecastHourly(latitude, longitude, options) {
-        return api(latitude, longitude, options).hourly();
-      }
-
-      /**
-       * Get minutely weather data
-       * @param {number} latitude positition
-       * @param {number} longitude positition
-       * @param {object} [options] - additional query options
-       * ... {unix timestamp} options.time - send timestamp for timemachine requests
-       * ... {boolean} options.extend - pass true for extended forecast 
-       * @returns {promise} - resolves with minutely weather data object
-       */
-      function getForecastMinutely(latitude, longitude, options) {
-        return api(latitude, longitude, options).minutely();
-      }
-
-      /**
-       * Get alerts weather data
-       * @param {number} latitude positition
-       * @param {number} longitude positition
-       * @param {object} [options] - additional query options
-       * ... {unix timestamp} options.time - send timestamp for timemachine requests
-       * ... {boolean} options.extend - pass true for extended forecast 
-       * @returns {promise} - resolves with alerts weather data object
-       */
-      function getAlerts(latitude, longitude, options) {
-        return api(latitude, longitude, options).alerts();
-      }
-
-      /**
-       * Get flags weather data
-       * @param {number} latitude positition
-       * @param {number} longitude positition
-       * @param {object} [options] - additional query options
-       * ... {unix timestamp} options.time - send timestamp for timemachine requests
-       * ... {boolean} options.extend - pass true for extended forecast 
-       * @returns {promise} - resolves with flags weather data object
-       */
-      function getFlags(latitude, longitude, options) {
-        return api(latitude, longitude, options).flags();
-      }
-
+	  function getWeather(latitude, longitude, data, options) {
+		  return api(latitude, longitude, data, options).getData();
+	  }
+	  
       /**
        * Get units object showing units returned based on configured language/units
        * @returns {object} units
@@ -190,7 +131,7 @@
             unitsObject = getCaUnits();
             break;
           case 'uk2':
-            unitsObject = getUk2Units();
+			unitsObject = getUk2Units();
             break;
           case 'us':
             unitsObject = getUsUnits();
@@ -211,7 +152,7 @@
        * @param {object} options
        * @returns {oObject} - object with API method properties
        */
-      function api(latitude, longitude, options) {
+      function api(latitude, longitude, options, data) {
         var time;
 
         // check for time option
@@ -222,30 +163,11 @@
           }
         }
         return {
-          current: function() {
-            var query = excludeString('currently') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          },
-          daily: function() {
-            var query = excludeString('daily') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          },
-          hourly: function() {
-            var query = excludeString('hourly') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          },
-          minutely: function() {
-            var query = excludeString('minutely') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          },
-          alerts: function() {
-            var query = excludeString('alerts') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          },
-          flags: function() {
-            var query = excludeString('flags') + optionsString(options);
-            return fetch(latitude, longitude, query, time);
-          }
+
+		  getData: function() {
+			var query = excludeString(data) + optionsString(options);
+			return fetch(latitude, longitude, query, time);
+		  }
         };
       }
 
@@ -256,7 +178,7 @@
        */
       function excludeString(toRetrieve) {
         var blocks = ['alerts', 'currently', 'daily', 'flags', 'hourly', 'minutely'],
-          excludes = _.without(blocks, toRetrieve),
+		  excludes = _.difference(blocks, toRetrieve),
           query = _.join(excludes, ',');
         return config.baseExclude +  query;
       }
@@ -272,10 +194,15 @@
           },
           atts = _.defaults(options, defaults),
           query = '';
+		  
+		if (!options) {						
+		// Added because original code returned options as 'undefined' causing issue when getting data (excludes had 'mintutesundefined' rather than just 'minutes')
+			return options = '';		
+		}
         if (options) {
           // parse extend option
           if (atts.extend) {
-            query += '&extend=hourly';
+            return query += '&extend=hourly';		
           }
         }
       }
@@ -290,13 +217,16 @@
        */
       function fetch(latitude, longitude, query, time) {
         var time = time ? ', ' + time : '',
-          url = [config.baseUri, apiKey, '/', latitude, ',', longitude, time, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK'].join('');
+          url = [config.baseUri, apiKey, '/', latitude, ',', longitude, time, '?units=', units, '&lang=', language, query, '&callback=JSON_CALLBACK', '&Accept-Encoding:gzip'].join('');
         return $http
           .jsonp(url)
           .then(function(results) {
             // check response code
             if (parseInt(results.status) === 200) {
-              return results.data;
+              winddirection(results);
+			  dailyBars(results);
+			  tempDirection(results);
+			  return results.data;
             } else {
               return $q.reject(results);
             }
@@ -305,6 +235,80 @@
             return $q.reject(status);
           });
       }
+
+	  // convert wind bearing degrees to cardinal direction, return nothing if no wind
+	  function winddirection (results) {
+		if (!results.data.currently.windBearing) {
+			return '';
+		}
+		else {
+			var windBearing = results.data.currently.windBearing;
+			while( windBearing < 0 ) windBearing += 360 ;
+			while( windBearing >= 360 ) windBearing -= 360 ; 
+			var val= Math.round( (windBearing -11.25 ) / 22.5 ) ;
+			var arr=["N","NNE","NE","ENE","E","ESE", "SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"] ;
+			var windDirection = arr[ Math.abs(val) ] ;
+			
+			return results.data.currently.windBearing = windDirection;
+		}
+	  }
+	  
+	  function dailyBars (results) {
+		var numDays = Math.max(6, results.data.daily.data.length);
+		var tempRange = -Infinity;
+		var maxOverallTemp = -Infinity;
+        var minOverallTemp = Infinity;
+		
+		for (var d = 0; d < numDays; d++) {
+			tempRange = results.data.daily.data[d];
+			tempRange.temperatureMax > maxOverallTemp  && (maxOverallTemp = tempRange.temperatureMax); 
+			tempRange.temperatureMin < minOverallTemp && (minOverallTemp = tempRange.temperatureMin);
+	  }
+		var barSpace = 82;
+		var tempDiff = maxOverallTemp - minOverallTemp;
+        for (var d = 0; d < numDays; d++) {
+            //(function(results) {
+			tempRange = results.data.daily.data[d];
+            var height = barSpace * (tempRange.temperatureMax - tempRange.temperatureMin) / tempDiff;
+            var top = barSpace * (maxOverallTemp - tempRange.temperatureMax) / tempDiff;
+				
+				//forEach(results.data.daily.data,function(v) {
+					results.data.daily.data[d].height = height;
+					results.data.daily.data[d].top = top;
+				//});
+			}
+           // })
+		return results;
+	
+	  }
+	  
+	  function tempDirection (results) {
+        if (!results.data.hourly) {		// if no hourly data, then don't process this
+			results.data.currently.data.tempDirection = '';
+		}
+		else {
+			var r = (new Date).getTime() / 1e3,
+			hourlyData = results.data.hourly.data;
+			var l = 0;
+			
+			for (var c = 0; c < hourlyData.length; c++) {
+					if (hourlyData[c].time < r) continue;
+					l = hourlyData[c].temperature > results.data.currently.temperature ? 1 : -1;
+					break;
+				}
+			if (l = 1) {
+				results.data.currently.tempDirection = 'and rising';
+			}
+			else if (l = -1) {
+				results.data.currently.tempDirection = 'and falling';
+			}	
+			else {
+				results.data.currently.tempDirection = '';
+			}
+		
+		}
+		return results;
+	  }
 
       /**
        * Return the us response units
